@@ -8,7 +8,8 @@ let y = Math.floor((Math.random() * height) / 2);
 let xi = x;
 let yi = y;
 let direction = 0;
-const length = 50;
+let prevDir = direction;
+const length = 200;
 ctx.lineJoin = 'square';
 ctx.lineCap = 'square';
 ctx.lineWidth = 20;
@@ -22,41 +23,68 @@ ctx.stroke();
 
 function draw(dir) {
   // move x/y according to key press
+  console.log(prevDir);
   switch (dir) {
     case 90:
       y -= MOVE_AMOUNT;
       yi = y + length;
       xi = x;
+      // start the path
+      if (prevDir === 180) {
+        ctx.beginPath();
+        x -= length;
+        xi -= length;
+        ctx.moveTo(x, y);
+        ctx.lineTo(xi, yi);
+        ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(xi, yi);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+      }
+
       break;
     case 0:
       x += MOVE_AMOUNT;
       xi = x - length;
       yi = y;
+      // start the path
+      ctx.beginPath();
+      ctx.moveTo(xi, yi);
+      ctx.lineTo(x, y);
+      ctx.stroke();
       break;
     case 270:
       y += MOVE_AMOUNT;
-      yi = y - length;
+      yi = y + length;
       xi = x;
+      // start the path
+      ctx.beginPath();
+      ctx.moveTo(xi, yi);
+      ctx.lineTo(x, y);
+      ctx.stroke();
       break;
     case 180:
       x -= MOVE_AMOUNT;
       xi = x - length;
       yi = y;
+      // start the path
+      ctx.beginPath();
+      ctx.moveTo(xi, yi);
+      ctx.lineTo(x, y);
+      ctx.stroke();
       break;
 
     default:
       break;
   }
-  // start the path
-  ctx.beginPath();
-  ctx.moveTo(xi, yi);
-  ctx.lineTo(x, y);
-  ctx.stroke();
 }
 
 function handleKey(e) {
   if (typeof e !== 'boolean') {
     if (e.key.includes('Arrow')) {
+      prevDir = direction;
       e.preventDefault();
       switch (e.key) {
         case 'ArrowUp':
