@@ -3,10 +3,10 @@ const ctx = canvas.getContext('2d');
 
 const { width, height } = canvas;
 const MOVE_AMOUNT = 10;
-let x = Math.floor((Math.random() * width) / 2);
-let y = Math.floor((Math.random() * height) / 2);
+const x = Math.floor((Math.random() * width) / 2);
+const y = Math.floor((Math.random() * height) / 2);
 let xi = x;
-let yi = y;
+const yi = y;
 let direction = 0;
 let prevDir = direction;
 const length = 200;
@@ -23,59 +23,32 @@ ctx.stroke();
 
 function draw(dir) {
   // move x/y according to key press
-  console.log(prevDir);
   switch (dir) {
-    case 90:
-      y -= MOVE_AMOUNT;
-      yi = y + length;
-      xi = x;
-      // start the path
-      if (prevDir === 180) {
-        ctx.beginPath();
-        x -= length;
-        xi -= length;
-        ctx.moveTo(x, y);
-        ctx.lineTo(xi, yi);
-        ctx.stroke();
-      } else {
+    case 0:
+      if (prevDir !== 180) {
+        xi = x - length;
         ctx.beginPath();
         ctx.moveTo(xi, yi);
         ctx.lineTo(x, y);
         ctx.stroke();
+        console.log('right');
       }
-
       break;
-    case 0:
-      x += MOVE_AMOUNT;
-      xi = x - length;
-      yi = y;
-      // start the path
-      ctx.beginPath();
-      ctx.moveTo(xi, yi);
-      ctx.lineTo(x, y);
-      ctx.stroke();
-      break;
-    case 270:
-      y += MOVE_AMOUNT;
-      yi = y + length;
-      xi = x;
-      // start the path
-      ctx.beginPath();
-      ctx.moveTo(xi, yi);
-      ctx.lineTo(x, y);
-      ctx.stroke();
+    case 90:
+      if (prevDir !== 270) {
+        console.log('up');
+      }
       break;
     case 180:
-      x -= MOVE_AMOUNT;
-      xi = x - length;
-      yi = y;
-      // start the path
-      ctx.beginPath();
-      ctx.moveTo(xi, yi);
-      ctx.lineTo(x, y);
-      ctx.stroke();
+      if (prevDir !== 0) {
+        console.log('left');
+      }
       break;
-
+    case 270:
+      if (prevDir !== 90) {
+        console.log('down');
+      }
+      break;
     default:
       break;
   }
@@ -104,7 +77,6 @@ function handleKey(e) {
       }
     }
     draw(direction);
-    console.log(x, y, xi, yi);
   }
 }
 function gameLoop() {
