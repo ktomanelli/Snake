@@ -2,62 +2,80 @@ const canvas = document.querySelector('#canvas');
 const ctx = canvas.getContext('2d');
 
 const { width, height } = canvas;
-const MOVE_AMOUNT = 10;
-const x = Math.floor((Math.random() * width) / 2);
-const y = Math.floor((Math.random() * height) / 2);
-let xi = x;
-const yi = y;
+const speed = 10;
+
+let x = Math.floor((Math.random() * width) / 2);
+let y = Math.floor((Math.random() * height) / 2);
+
+const snakeCoords = [];
 let direction = 0;
-let prevDir = direction;
-const length = 200;
+const length = 100;
 ctx.lineJoin = 'square';
 ctx.lineCap = 'square';
 ctx.lineWidth = 20;
 ctx.lineLength = 100;
 ctx.strokeStyle = `hsl(100,100%,50%)`;
 
-ctx.beginPath();
-ctx.moveTo(xi, yi);
-ctx.lineTo(x, y);
-ctx.stroke();
+function getChange(num, dir) {
+  if (num === 0) {
+    if (dir === 0) {
+      x += speed;
+      return 1;
+    }
+    if (dir === 90) {
+      return 0;
+    }
+    if (dir === 180) {
+      x -= speed;
+      return -1;
+    }
+    if (dir === 270) {
+      return 0;
+    }
+  } else {
+    if (dir === 0) {
+      return 0;
+    }
+    if (dir === 90) {
+      y -= speed;
+      return 1;
+    }
+    if (dir === 180) {
+      return 0;
+    }
+    if (dir === 270) {
+      y += speed;
+      return -1;
+    }
+  }
+}
 
+function buildSnake(dir) {
+  for (let i = 0; i < length; i++) {
+    snakeCoords.unshift([
+      x + i * getChange(0, direction),
+      y + i * getChange(1, direction),
+    ]);
+  }
+}
+function updateSnake(dir) {
+  snakeCoords.unshift([x + getChange(0, dir), y + getChange(1, dir)]);
+  snakeCoords.pop();
+}
 function draw(dir) {
-  // move x/y according to key press
-  switch (dir) {
-    case 0:
-      if (prevDir !== 180) {
-        xi = x - length;
-        ctx.beginPath();
-        ctx.moveTo(xi, yi);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        console.log('right');
-      }
-      break;
-    case 90:
-      if (prevDir !== 270) {
-        console.log('up');
-      }
-      break;
-    case 180:
-      if (prevDir !== 0) {
-        console.log('left');
-      }
-      break;
-    case 270:
-      if (prevDir !== 90) {
-        console.log('down');
-      }
-      break;
-    default:
-      break;
+  ctx.beginPath();
+  updateSnake(dir);
+  console.log(snakeCoords);
+  for (let i = 0; i < snakeCoords.length; i++) {
+    ctx.moveTo(snakeCoords[i][0], snakeCoords[i][1]);
+    ctx.lineTo(snakeCoords[i][0], snakeCoords[i][1]);
+    ctx.stroke();
   }
 }
 
 function handleKey(e) {
   if (typeof e !== 'boolean') {
     if (e.key.includes('Arrow')) {
-      prevDir = direction;
       e.preventDefault();
       switch (e.key) {
         case 'ArrowUp':
@@ -87,4 +105,5 @@ function gameLoop() {
 }
 
 window.addEventListener('keydown', handleKey);
+buildSnake(direction);
 requestAnimationFrame(gameLoop);
