@@ -3,13 +3,14 @@ const ctx = canvas.getContext('2d');
 
 const { width, height } = canvas;
 const speed = 20;
-
-let x = Math.floor((Math.random() * width) / 2);
-let y = Math.floor((Math.random() * height) / 2);
-
+const snackLoc = [0, 0];
+let x = Math.floor((Math.random() * width) / 20);
+let y = Math.floor((Math.random() * height) / 20);
+let snack = false;
 const snakeCoords = [];
 let direction = 0;
-const length = 50;
+const length = 10;
+let isPaused = false;
 ctx.lineJoin = 'square';
 ctx.lineCap = 'square';
 ctx.lineWidth = 20;
@@ -71,13 +72,32 @@ function buildSnake(dir) {
   }
 }
 function updateSnake(dir) {
-  snakeCoords.unshift([x + getChange(0, dir), y + getChange(1, dir)]);
-  snakeCoords.pop();
+  if (!isPaused) {
+    snakeCoords.unshift([x + getChange(0, dir), y + getChange(1, dir)]);
+    if (snakeCoords[0] === snackLoc) {
+      snack = false;
+    }
+    snakeCoords.pop();
+  }
+}
+function generateSnacks() {
+  if (!snack) {
+    snackLoc[0] = Math.floor((Math.random() * width) / 20);
+    snackLoc[1] = Math.floor((Math.random() * height) / 20);
+    snack = true;
+  }
+  // ctx.strokeStyle = `hsl(0,100%,50%)`;
+  ctx.beginPath();
+  ctx.moveTo(snackLoc[0], snackLoc[1]);
+  ctx.lineTo(snackLoc[0], snackLoc[1]);
+  ctx.stroke();
 }
 function draw() {
   ctx.beginPath();
+  generateSnacks();
   updateSnake(direction);
-  // console.log(snakeCoords);
+  console.log(snakeCoords);
+  console.log(snackLoc);
   // console.log(speed);
   for (let i = 0; i < snakeCoords.length; i += 1) {
     ctx.moveTo(snakeCoords[i][0], snakeCoords[i][1]);
@@ -85,9 +105,22 @@ function draw() {
     ctx.stroke();
   }
 }
-
+function togglePause() {
+  if (isPaused === true) {
+    isPaused = false;
+  } else {
+    isPaused = true;
+    // add a ctx pattern that says paused and flashes soft white
+  }
+}
 function handleKey(e) {
+  // console.log(e.key);
   if (typeof e !== 'boolean') {
+    if (e.key === ' ') {
+      e.preventDefault();
+      togglePause();
+      // console.log(isPaused);
+    }
     if (e.key.includes('Arrow')) {
       e.preventDefault();
       switch (e.key) {
@@ -110,6 +143,7 @@ function handleKey(e) {
     // draw();
   }
 }
+
 function gameLoop() {
   window.setTimeout(() => {
     ctx.clearRect(0, 0, width, height);
@@ -121,4 +155,5 @@ function gameLoop() {
 
 window.addEventListener('keydown', handleKey);
 buildSnake(direction);
+
 requestAnimationFrame(gameLoop);
