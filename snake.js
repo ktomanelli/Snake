@@ -4,11 +4,12 @@ const ctx = canvas.getContext('2d');
 const { width, height } = canvas;
 const speed = 20;
 const snackLoc = [0, 0];
-let x = Math.floor((Math.random() * width) / 20);
-let y = Math.floor((Math.random() * height) / 20);
+let x = 20 * Math.floor(Math.random() * (width / 20 + 1));
+let y = 20 * Math.floor(Math.random() * (height / 20 + 1));
 let snack = false;
 const snakeCoords = [];
 let direction = 0;
+let prevDir;
 const length = 10;
 let isPaused = false;
 ctx.lineJoin = 'square';
@@ -73,8 +74,16 @@ function buildSnake(dir) {
 }
 function updateSnake(dir) {
   if (!isPaused) {
-    snakeCoords.unshift([x + getChange(0, dir), y + getChange(1, dir)]);
-    if (snakeCoords[0] === snackLoc) {
+    getChange(0, dir);
+    getChange(1, dir);
+    snakeCoords.unshift([x, y]);
+    if (
+      snakeCoords[0][0] === snackLoc[0] &&
+      snakeCoords[0][1] === snackLoc[1]
+    ) {
+      console.log(snakeCoords[0]);
+      console.log(snackLoc[0]);
+
       snack = false;
     }
     snakeCoords.pop();
@@ -82,8 +91,8 @@ function updateSnake(dir) {
 }
 function generateSnacks() {
   if (!snack) {
-    snackLoc[0] = Math.floor((Math.random() * width) / 20);
-    snackLoc[1] = Math.floor((Math.random() * height) / 20);
+    snackLoc[0] = 20 * Math.floor(Math.random() * (width / 20 + 1));
+    snackLoc[1] = 20 * Math.floor(Math.random() * (height / 20 + 1));
     snack = true;
   }
   // ctx.strokeStyle = `hsl(0,100%,50%)`;
@@ -96,8 +105,8 @@ function draw() {
   ctx.beginPath();
   generateSnacks();
   updateSnake(direction);
-  console.log(snakeCoords);
-  console.log(snackLoc);
+  // console.log(snakeCoords);
+  // console.log(snackLoc);
   // console.log(speed);
   for (let i = 0; i < snakeCoords.length; i += 1) {
     ctx.moveTo(snakeCoords[i][0], snakeCoords[i][1]);
@@ -140,7 +149,6 @@ function handleKey(e) {
           break;
       }
     }
-    // draw();
   }
 }
 
