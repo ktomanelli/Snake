@@ -8,9 +8,9 @@ let x = 20 * Math.floor(Math.random() * (width / 20 + 1));
 let y = 20 * Math.floor(Math.random() * (height / 20 + 1));
 let snack = false;
 const snakeCoords = [];
-let direction = 0;
-let prevDir;
+const direction = [0, 0];
 const length = 10;
+const go = 0;
 let isPaused = false;
 ctx.lineJoin = 'square';
 ctx.lineCap = 'square';
@@ -20,56 +20,68 @@ ctx.strokeStyle = `hsl(100,100%,50%)`;
 
 function getChange(num, dir) {
   if (num === 0) {
-    if (dir === 0) {
+    // X
+    if (dir[0] === 0) {
       if (x >= width) {
         x = 0;
       }
-      x += speed;
-      return 1;
-    }
-    if (dir === 90) {
+      if (dir[1] !== 180) {
+        x += speed;
+        return 1;
+      }
       return 0;
     }
-    if (dir === 180) {
+    if (dir[0] === 90) {
+      return 0;
+    }
+    if (dir[0] === 180) {
       if (x <= 0) {
         x = width;
       }
-      x -= speed;
-      return -1;
+      if (dir[1] !== 0) {
+        x -= speed;
+        return -1;
+      }
+      return 0;
     }
-    if (dir === 270) {
+    if (dir[0] === 270) {
       return 0;
     }
   } else {
-    if (dir === 0) {
+    // Y
+    if (dir[0] === 0) {
       return 0;
     }
-    if (dir === 90) {
+    if (dir[0] === 90) {
       if (y <= 0) {
         y = height;
       }
-      y -= speed;
-      return 1;
-    }
-    if (dir === 180) {
+      if (dir[1] !== 270) {
+        y -= speed;
+        return 1;
+      }
       return 0;
     }
-    if (dir === 270) {
+    if (dir[0] === 180) {
+      return 0;
+    }
+    if (dir[0] === 270) {
       if (y >= height) {
         y = 0;
       }
-      y += speed;
-      return -1;
+      if (dir[1] !== 90) {
+        y += speed;
+        return -1;
+      }
+
+      return 0;
     }
   }
 }
 
 function buildSnake(dir) {
   for (let i = 0; i < length; i += 1) {
-    snakeCoords.unshift([
-      x + i * getChange(0, direction),
-      y + i * getChange(1, direction),
-    ]);
+    snakeCoords.unshift([x + i * getChange(0, dir), y + i * getChange(1, dir)]);
   }
 }
 function updateSnake(dir) {
@@ -81,8 +93,8 @@ function updateSnake(dir) {
       snakeCoords[0][0] === snackLoc[0] &&
       snakeCoords[0][1] === snackLoc[1]
     ) {
-      console.log(snakeCoords[0]);
-      console.log(snackLoc[0]);
+      // console.log(snakeCoords[0]);
+      // console.log(snackLoc[0]);
 
       snack = false;
     }
@@ -105,9 +117,6 @@ function draw() {
   ctx.beginPath();
   generateSnacks();
   updateSnake(direction);
-  // console.log(snakeCoords);
-  // console.log(snackLoc);
-  // console.log(speed);
   for (let i = 0; i < snakeCoords.length; i += 1) {
     ctx.moveTo(snakeCoords[i][0], snakeCoords[i][1]);
     ctx.lineTo(snakeCoords[i][0], snakeCoords[i][1]);
@@ -128,22 +137,25 @@ function handleKey(e) {
     if (e.key === ' ') {
       e.preventDefault();
       togglePause();
-      // console.log(isPaused);
     }
     if (e.key.includes('Arrow')) {
       e.preventDefault();
       switch (e.key) {
         case 'ArrowUp':
-          direction = 90;
+          direction.unshift(90);
+          direction.pop();
           break;
         case 'ArrowDown':
-          direction = 270;
+          direction.unshift(270);
+          direction.pop();
           break;
         case 'ArrowLeft':
-          direction = 180;
+          direction.unshift(180);
+          direction.pop();
           break;
         case 'ArrowRight':
-          direction = 0;
+          direction.unshift(0);
+          direction.pop();
           break;
         default:
           break;
