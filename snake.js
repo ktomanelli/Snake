@@ -126,9 +126,14 @@ function draw() {
 function togglePause() {
   if (isPaused === true) {
     isPaused = false;
+    console.log('false');
   } else {
     isPaused = true;
-    // add a ctx pattern that says paused and flashes soft white
+    console.log('true');
+
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 72px Arial';
+    ctx.fillText('PAUSED', canvas.width / 2 - 17, canvas.height / 2 - 18);
   }
 }
 function handleKey(e) {
@@ -166,14 +171,16 @@ function handleKey(e) {
 
 function gameLoop() {
   window.setTimeout(() => {
-    ctx.clearRect(0, 0, width, height);
-    draw();
+    if (isPaused === false) {
+      ctx.clearRect(0, 0, width, height);
+      draw();
+    }
     requestAnimationFrame(gameLoop);
   }, 50);
-  // requestAnimationFrame(gameLoop);
 }
 
 window.addEventListener('keydown', handleKey);
+
 buildSnake(direction);
 
 requestAnimationFrame(gameLoop);
